@@ -1,0 +1,47 @@
+{% extends "base.html" %} 
+{% block title %}{{ book.booktitle }} - Library Demo{% endblock %} 
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Book Details</h2>
+    
+    <div class="row">
+        <!-- Book Cover -->
+        <div class="col-md-4">
+            <div class="book-detail-cover-container">
+                {% if book.image and book.image.strip() %}
+                <img src="{{ url_for('static', filename='book-covers/' + book.image) }}" 
+                     alt="{{ book.booktitle }}" 
+                     class="book-detail-cover-image"
+                     onerror="this.src='/static/book-covers/no-cover-image.jpg';">
+                {% else %}
+                <img src="{{ url_for('static', filename='book-covers/no-cover-image.jpg') }}" 
+                     alt="{{ book.booktitle }}" 
+                     class="book-detail-cover-image">
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Book Details -->
+        <div class="col-md-8">
+            <h1 class="mb-4">{{ book.booktitle }}</h1>
+            
+            <div class="mb-4">
+                <p class="fs-5 mb-3"><strong>Author:</strong> {{ book.author }}</p>
+                <p class="fs-5 mb-3"><strong>Category:</strong> 
+                    <span class="badge bg-info fs-6">{{ book.bookcategory }}</span>
+                </p>
+                <p class="fs-5 mb-3"><strong>Year of Publication:</strong> {{ book.yearofpublication }}</p>
+            </div>
+            
+            {% if book.description %}
+            <div class="bg-light p-4 rounded">
+                <h5 class="mb-3">Description</h5>
+                <p class="mb-0">{{ book.description }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %} 

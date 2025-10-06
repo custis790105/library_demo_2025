@@ -1,0 +1,85 @@
+{% extends "base.html" %} 
+{% block title %}Loans by Borrower - Library Demo{% endblock %} 
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Loans by Borrower</h2>
+    
+    {% if loans_by_borrower %}
+        {% for borrower_id, borrower_data in loans_by_borrower.items() %}
+        <div class="mb-5">
+            <!-- Borrower Header -->
+            <div class="bg-primary text-white p-3 rounded-top">
+                <h4 class="mb-0">
+                    {{ borrower_data.borrower.firstname }} {{ borrower_data.borrower.familyname }}
+                </h4>
+            </div>
+            
+            <!-- Loans Table -->
+            <table class="table table-striped table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Loan Date</th>
+                            <th>Status</th>
+                            <th>Return Date</th>
+                            <th>Copy</th>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Category</th>
+                            <th>Year</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loan in borrower_data.loans %}
+                        <tr{% if loan.is_overdue %} class="table-danger"{% endif %}>
+                            <td>{{ loan.loandate.strftime('%d %b %Y') if loan.loandate else 'N/A' }}</td>
+                            <td>
+                                {% if loan.loan_status == 'On Loan' %}
+                                    <span class="badge bg-warning text-dark">{{ loan.loan_status }}</span>
+                                {% else %}
+                                    <span class="badge bg-success">{{ loan.loan_status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if loan.returned %}
+                                    {{ loan.returned.strftime('%d %b %Y') }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ loan.format }} (ID: {{ loan.bookcopyid }})</td>
+                            <td><strong>{{ loan.booktitle }}</strong></td>
+                            <td>{{ loan.author }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ loan.bookcategory }}</span>
+                            </td>
+                            <td>{{ loan.yearofpublication }}</td>
+                            <td>
+                                {% if loan.loan_status == 'On Loan' %}
+                                <form method="POST" action="{{ url_for('return_book', loan_id=loan.loanid) }}" 
+                                      style="display: inline;" 
+                                      onsubmit="return confirm('Are you sure you want to return this book?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                        Return
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        <h5 class="alert-heading">No loan records found</h5>
+        <p>There are currently no loan records in the system.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %} 

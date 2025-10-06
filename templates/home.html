@@ -1,0 +1,48 @@
+{% extends "base.html" %} {% block title %}Home - Library Demo{% endblock %} {% block content %}
+<div class="container mt-4">
+    <!-- Welcome Section -->
+    <div class="welcome-section mb-5">
+        <div class="text-center">
+            <h2 class="mb-3">Nau mai! Welcome!</h2>
+            <h4 class="mb-3">Welcome to your local library</h4>
+            <p class="lead">Books are available to all members of COMP636 (if they buy them from somewhere else!).</p>
+        </div>
+    </div>
+
+    <!-- Popular Books Section -->
+    <div class="popular-books-section">
+        <h3 class="mb-4 text-center">Our most popular three books</h3>
+
+        {% if popular_books %}
+        <div class="row justify-content-center">
+            {% for book in popular_books %}
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="text-center">
+                    <a href="{{ url_for('book_detail', book_id=book.bookid) }}" class="text-decoration-none">
+                        <div class="d-flex align-items-center justify-content-center bg-light rounded shadow mb-3 book-cover-container">
+                            {% if book.image and book.image.strip() %}
+                            <img src="{{ url_for('static', filename='book-covers/' + book.image) }}" 
+                                 alt="{{ book.booktitle }}" 
+                                 class="img-fluid book-cover-image"
+                                 onerror="this.src='/static/book-covers/no-cover-image.jpg';">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='book-covers/no-cover-image.jpg') }}" 
+                                 alt="{{ book.booktitle }}" 
+                                 class="img-fluid book-cover-image">
+                            {% endif %}
+                        </div>
+                        <h6 class="text-dark">{{ book.booktitle }}</h6>
+                    </a>
+                    <small class="text-muted">{{ book.loan_count }} times borrowed</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            <p>No borrowing records found yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

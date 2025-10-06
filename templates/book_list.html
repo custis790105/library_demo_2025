@@ -1,0 +1,110 @@
+{% extends "base.html" %} 
+{% block title %}List Books - Library Demo{% endblock %} 
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-4">List Books</h2>
+    
+    <!-- Search Form -->
+    <div class="bg-light p-4 rounded mb-4">
+        <form method="POST" action="{{ url_for('book_search') }}">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="title" name="title" 
+                           placeholder="Search by title..." value="{{ title_search }}">
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="author" class="form-label">Author</label>
+                    <input type="text" class="form-control" id="author" name="author" 
+                           placeholder="Search by author..." value="{{ author_search }}">
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" id="category" name="category">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.category }}" 
+                                {% if cat.category == category_search %}selected{% endif %}>
+                            {{ cat.category }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary me-2">
+                        Search
+                    </button>
+                    <a href="{{ url_for('book_list') }}" class="btn btn-secondary me-2">
+                        Clear
+                    </a>
+                                         <a href="{{ url_for('book_add') }}" class="btn btn-primary">
+                        Add New Book
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Search Results -->
+    {% if request.method == 'POST' %}
+        {% if books %}
+        <div class="mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Category</th>
+                            <th>Year</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in books %}
+                        <tr>
+                            <td><strong>{{ book.booktitle }}</strong></td>
+                            <td>{{ book.author }}</td>
+                            <td>
+                                {% if book.bookcategory %}
+                                <span class="badge bg-info">{{ book.bookcategory }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ book.yearofpublication if book.yearofpublication else '' }}</td>
+                            <td>
+                                <a href="{{ url_for('book_detail', book_id=book.bookid) }}" 
+                                   class="btn btn-sm btn-outline-primary me-2">
+                                    View Details
+                                </a>                                
+                                <a href="{{ url_for('book_edit', book_id=book.bookid) }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    Edit
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning" role="alert">
+            <h5 class="alert-heading">No books found</h5>
+            <p>No books match your search criteria. Please try different search terms.</p>
+        </div>
+        {% endif %}
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        <h5 class="alert-heading">Welcome to Book Search</h5>
+        <p>Use the search form above to find books in our library. You can search by title, author, or category. Leave all fields empty to see all books.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %} 

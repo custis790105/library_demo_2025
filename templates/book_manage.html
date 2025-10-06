@@ -1,0 +1,89 @@
+{% extends "base.html" %} 
+{% block title %}{% if is_edit %}Edit Book{% else %}Add New Book{% endif %} - Library Demo{% endblock %} 
+{% block content %}
+
+    <div class="container mt-4">
+        <div class="mb-4">
+            <h2>{% if is_edit %}Edit Book{% else %}Add New Book{% endif %}</h2>
+        </div>
+    
+    <!-- Book Form -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="bg-light p-4 rounded">
+                <form method="POST" 
+                      action="{% if is_edit %}{{ url_for('book_update', book_id=book.bookid) }}{% else %}{{ url_for('book_save') }}{% endif %}">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="booktitle" class="form-label">Book Title *</label>
+                            <input type="text" class="form-control" id="booktitle" name="booktitle" 
+                                   value="{{ book.booktitle if book else '' }}" 
+                                   placeholder="Enter book title" maxlength="45" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="author" class="form-label">Author *</label>
+                            <input type="text" class="form-control" id="author" name="author" 
+                                   value="{{ book.author if book else '' }}" 
+                                   placeholder="Enter author name" maxlength="45" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="bookcategory" class="form-label">Category</label>
+                            <select class="form-control" id="bookcategory" name="bookcategory">
+                                <option value="">-- Select Category --</option>
+                                {% for category in categories %}
+                                <option value="{{ category.category }}" 
+                                        {% if book and book.bookcategory == category.category %}selected{% endif %}>
+                                    {{ category.category }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="yearofpublication" class="form-label">Year of Publication</label>
+                            <input type="number" class="form-control" id="yearofpublication" name="yearofpublication" 
+                                   value="{{ book.yearofpublication if book and book.yearofpublication else '' }}" 
+                                   placeholder="Enter year (e.g., 2023)" min="1000" max="2099">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="image" class="form-label">Cover Image Filename</label>
+                            <input type="text" class="form-control" id="image" name="image" 
+                                   value="{{ book.image if book and book.image else '' }}" 
+                                   placeholder="e.g., book-cover.jpg" maxlength="50">
+                            <small class="form-text text-muted">
+                                Filename for book cover image in static/book-covers/
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" 
+                                  placeholder="Enter book description (optional)">{{ book.description if book and book.description else '' }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary me-2">
+                                {% if is_edit %}Update Book{% else %}Create Book{% endif %}
+                            </button>
+                            <a href="{{ url_for('book_list') }}" class="btn btn-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %} 

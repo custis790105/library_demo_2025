@@ -1,0 +1,89 @@
+{% extends "base.html" %} {% block title %}Current Loans - Library Demo{% endblock %} {% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Current Loans</h2>
+
+    <!-- Search Form -->
+    <div class="bg-light p-4 rounded mb-4">
+        <form method="POST" action="{{ url_for('loan_current') }}">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="firstname" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="firstname" name="firstname" value="{{ firstname_search }}" placeholder="Enter first name" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="lastname" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="lastname" name="lastname" value="{{ lastname_search }}" placeholder="Enter last name" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div>
+                        <button type="submit" class="btn btn-primary me-2">Search</button>
+                        <a href="{{ url_for('loan_current') }}" class="btn btn-secondary">Clear</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results -->
+    {% if loans %}
+    <div class="mb-3">
+        <p class="text-muted">{% if firstname_search or lastname_search %} Found {{ loans|length }} loan(s) matching your search criteria. {% else %} Showing all {{ loans|length }} current loan(s). {% endif %}</p>
+    </div>
+
+    <div class="mb-4">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Borrower Name</th>
+                        <th>Loan Date</th>
+                        <th>Status</th>
+                        <th>Book Title</th>
+                        <th>Copy</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Year</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in loans %}
+                    <tr>
+                        <td><strong>{{ loan.firstname }} {{ loan.familyname }}</strong></td>
+                        <td>{{ loan.loandate.strftime('%d %b %Y') if loan.loandate else 'N/A' }}</td>
+                        <td>
+                            {% if loan.loan_status == 'Overdue' %}
+                            <span class="badge bg-danger">{{ loan.loan_status }}</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">{{ loan.loan_status }}</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ loan.booktitle }}</strong></td>
+                        <td>{{ loan.format }} (ID: {{ loan.bookcopyid }})</td>
+                        <td>{{ loan.author }}</td>
+                        <td>
+                            {% if loan.bookcategory %}
+                            <span class="badge bg-info">{{ loan.bookcategory }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ loan.yearofpublication if loan.yearofpublication else '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        <h5 class="alert-heading">No current loans found</h5>
+        {% if firstname_search or lastname_search %}
+        <p>No current loans match your search criteria. Try adjusting your search terms.</p>
+        {% else %}
+        <p>There are currently no active loans in the system.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Borrow a Book{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-4">
+        <h2>Borrow a Book</h2>
+    </div>
+
+    <!-- Loan Form -->
+    <div class="bg-light p-4 rounded mb-4">
+        <form method="POST" action="{{ url_for('loan_select_book') }}">
+            <!-- Borrower Selection -->
+            <div class="mb-3">
+                <label for="borrower" class="form-label">Select Borrower *</label>
+                <select class="form-control" id="borrower" name="borrower_id" required>
+                    <option value="">-- Choose Borrower --</option>
+                    {% for borrower in borrowers %}
+                    <option value="{{ borrower.borrowerid }}" {% if selected_borrower and selected_borrower == borrower.borrowerid|string %}selected{% endif %}>
+                        {{ borrower.familyname }} {{ borrower.firstname }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Book Selection -->
+            <div class="mb-3">
+                <label for="book" class="form-label">Select Book *</label>
+                <select class="form-control" id="book" name="book_id" required onchange="this.form.submit();">
+                    <option value="">-- Choose Book --</option>
+                    {% for book in books %}
+                    <option value="{{ book.bookid }}" {% if selected_book and selected_book == book.bookid|string %}selected{% endif %}>
+                        {{ book.booktitle }} - {{ book.author }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Copy Selection (show when book is selected) -->
+            {% if book_detail %}
+            <div class="mb-3">
+                <label for="copy" class="form-label">Select Copy *</label>
+                <select class="form-control" id="copy" name="copy_id" required>
+                    {% if available_copies %}
+                        <option value="">-- Choose Copy --</option>
+                        {% for copy in available_copies %}
+                        <option value="{{ copy.bookcopyid }}">
+                            {{ copy.format }} (ID: {{ copy.bookcopyid }})
+                        </option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="">No copies available</option>
+                    {% endif %}
+                </select>
+            </div>
+            {% endif %}
+            
+            <!-- Create Loan Button (always visible) -->
+            <div class="row">
+                <div class="col-12">
+                    <button type="submit" formaction="{{ url_for('loan') }}" class="btn btn-primary me-2">
+                        Create Loan
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Book Detail Panel -->
+    {% if book_detail %}
+    <div class="row">
+        <div class="col-md-3">
+            <div class="book-detail-cover-container">
+                {% if book_detail.image and book_detail.image.strip() %}
+                <img src="{{ url_for('static', filename='book-covers/' + book_detail.image) }}" 
+                     alt="{{ book_detail.booktitle }}" 
+                     class="book-detail-cover-image"
+                     onerror="this.src='/static/book-covers/no-cover-image.jpg';">
+                {% else %}
+                <img src="{{ url_for('static', filename='book-covers/no-cover-image.jpg') }}" 
+                     alt="{{ book_detail.booktitle }}" 
+                     class="book-detail-cover-image">
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <h4 class="mb-3">{{ book_detail.booktitle }}</h4>
+            
+            <div class="mb-3">
+                <p class="mb-2"><strong>Author:</strong> {{ book_detail.author }}</p>
+                <p class="mb-2"><strong>Category:</strong> 
+                    <span class="badge bg-info">{{ book_detail.bookcategory or 'N/A' }}</span>
+                </p>
+                <p class="mb-2"><strong>Year of Publication:</strong> {{ book_detail.yearofpublication or 'N/A' }}</p>
+            </div>
+            
+            {% if book_detail.description %}
+            <div class="bg-light p-3 rounded">
+                <h6 class="mb-2">Description</h6>
+                <p class="mb-0">{{ book_detail.description }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %} 
